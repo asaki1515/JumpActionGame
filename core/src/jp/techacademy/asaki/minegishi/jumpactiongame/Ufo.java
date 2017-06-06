@@ -10,5 +10,6 @@ public class Ufo extends GameObject {
     public Ufo(Texture texture, int srcX, int srcY, int srcWidth, int srcHeight) {
         super(texture, srcX, srcY, srcWidth, srcHeight);
         setSize(UFO_WIDTH, UFO_HEIGHT);
+
     }
 }

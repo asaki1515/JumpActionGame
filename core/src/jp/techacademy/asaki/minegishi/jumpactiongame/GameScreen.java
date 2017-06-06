@@ -3,6 +3,7 @@ package jp.techacademy.asaki.minegishi.jumpactiongame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -45,6 +46,11 @@ public class GameScreen extends ScreenAdapter {
     Random mRandom;
     List<Step> mSteps;
     List<Star> mStars;
+    ///
+    List<Enemy> mEnemys;
+    Sound mSound;
+    ///
+
     Ufo mUfo;
     Player mPlayer;
 
@@ -80,6 +86,10 @@ public class GameScreen extends ScreenAdapter {
         mRandom = new Random();
         mSteps = new ArrayList<Step>();
         mStars = new ArrayList<Star>();
+        ///
+        mEnemys = new ArrayList<Enemy>();
+        mSound = Gdx.audio.newSound(Gdx.files.internal("magic5.mp3"));
+        ///
         mGameState = GAME_STATE_READY;
         mTouchPoint = new Vector3(); // ←追加する
 
@@ -133,6 +143,11 @@ public class GameScreen extends ScreenAdapter {
             mStars.get(i).draw(mGame.batch);
         }
 
+        // Enemy
+        for (int i = 0; i < mEnemys.size(); i++) {
+            mEnemys.get(i).draw(mGame.batch);
+        }
+
         // UFO
         mUfo.draw(mGame.batch);
 
@@ -165,6 +180,7 @@ public class GameScreen extends ScreenAdapter {
         Texture starTexture = new Texture("star.png");
         Texture playerTexture = new Texture("uma.png");
         Texture ufoTexture = new Texture("ufo.png");
+        Texture enemyTexture = new Texture("monster.png");
 
         // StepとStarをゴールの高さまで配置していく
         float y = 0;
@@ -183,6 +199,14 @@ public class GameScreen extends ScreenAdapter {
                 star.setPosition(step.getX() + mRandom.nextFloat(), step.getY() + Star.STAR_HEIGHT + mRandom.nextFloat() * 3);
                 mStars.add(star);
             }
+
+            ///
+            if (mRandom.nextFloat() > 0.8f) {
+                Enemy enemy = new Enemy(enemyTexture, 0, 0, 450, 450);
+                enemy.setPosition(step.getX() + mRandom.nextFloat(), step.getY() + Enemy.ENEMY_HEIGHT + mRandom.nextFloat() * 3);
+                mEnemys.add(enemy);
+            }
+            ///
 
             y += (maxJumpHeight - 0.5f);
             y -= mRandom.nextFloat() * (maxJumpHeight / 3);
@@ -271,6 +295,19 @@ public class GameScreen extends ScreenAdapter {
             mGameState = GAME_STATE_GAMEOVER;
             return;
         }
+
+        // Enemyとの当たり判定
+        for (int i = 0; i < mEnemys.size(); i++) {
+            Enemy enemy = mEnemys.get(i);
+
+            if (mPlayer.getBoundingRectangle().overlaps(enemy.getBoundingRectangle())) {
+                mSound.play(1.0f);
+                //mSound.stop(id);
+                mGameState = GAME_STATE_GAMEOVER;
+                return;
+            }
+        }
+
 
         // Starとの当たり判定
         for (int i = 0; i < mStars.size(); i++) {
