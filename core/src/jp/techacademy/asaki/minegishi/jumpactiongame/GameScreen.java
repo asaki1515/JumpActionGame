@@ -23,7 +23,7 @@ public class GameScreen extends ScreenAdapter {
     static final float CAMERA_WIDTH = 10;
     static final float CAMERA_HEIGHT = 15;
     static final float WORLD_WIDTH = 10;
-    static final float WORLD_HEIGHT = 15 * 2; // 20画面分登れば終了
+    static final float WORLD_HEIGHT = 15 * 4; // 20画面分登れば終了
     static final float GUI_WIDTH = 320;
     static final float GUI_HEIGHT = 480;
 
@@ -38,10 +38,10 @@ public class GameScreen extends ScreenAdapter {
 
     Sprite mBg;
     OrthographicCamera mCamera;
-    OrthographicCamera mGuiCamera; // ←追加する
+    OrthographicCamera mGuiCamera;
 
     FitViewport mViewPort;
-    FitViewport mGuiViewPort; // ←追加する
+    FitViewport mGuiViewPort;
 
     Random mRandom;
     List<Step> mSteps;
@@ -54,13 +54,13 @@ public class GameScreen extends ScreenAdapter {
     Ufo mUfo;
     Player mPlayer;
 
-    float mHeightSoFar; // ←追加する
+    float mHeightSoFar;
     int mGameState;
-    Vector3 mTouchPoint; // ←追加する
-    BitmapFont mFont; // ←追加する
-    int mScore; // ←追加する
-    int mHighScore; // ←追加する
-    Preferences mPrefs; // ←追加する
+    Vector3 mTouchPoint;
+    BitmapFont mFont;
+    int mScore;
+    int mHighScore;
+    Preferences mPrefs;
 
     public GameScreen(JumpActionGame game) {
         mGame = game;
@@ -78,9 +78,9 @@ public class GameScreen extends ScreenAdapter {
         mViewPort = new FitViewport(CAMERA_WIDTH, CAMERA_HEIGHT, mCamera);
 
         // GUI用のカメラを設定する
-        mGuiCamera = new OrthographicCamera(); // ←追加する
-        mGuiCamera.setToOrtho(false, GUI_WIDTH, GUI_HEIGHT); // ←追加する
-        mGuiViewPort = new FitViewport(GUI_WIDTH, GUI_HEIGHT, mGuiCamera); // ←追加する
+        mGuiCamera = new OrthographicCamera();
+        mGuiCamera.setToOrtho(false, GUI_WIDTH, GUI_HEIGHT);
+        mGuiViewPort = new FitViewport(GUI_WIDTH, GUI_HEIGHT, mGuiCamera);
 
         // メンバ変数の初期化
         mRandom = new Random();
@@ -91,16 +91,16 @@ public class GameScreen extends ScreenAdapter {
         mSound = Gdx.audio.newSound(Gdx.files.internal("magic5.mp3"));
         ///
         mGameState = GAME_STATE_READY;
-        mTouchPoint = new Vector3(); // ←追加する
+        mTouchPoint = new Vector3();
 
-        mFont = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false); // ←追加する
-        mFont.getData().setScale(0.8f);// ←追加する
-        mScore = 0;// ←追加する
-        mHighScore = 0;// ←追加する
+        mFont = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false);
+        mFont.getData().setScale(0.8f);
+        mScore = 0;
+        mHighScore = 0;
 
         // ハイスコアをPreferencesから取得する
-        mPrefs = Gdx.app.getPreferences("jp.techacademy.asaki.minegishi.jumpactiongame"); // ←追加する
-        mHighScore = mPrefs.getInteger("HIGHSCORE", 0); // ←追加する
+        mPrefs = Gdx.app.getPreferences("jp.techacademy.asaki.minegishi.jumpactiongame");
+        mHighScore = mPrefs.getInteger("HIGHSCORE", 0);
 
         createStage();
     }
@@ -116,9 +116,9 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // カメラの中心を超えたらカメラを上に移動させる つまりキャラが画面の上半分には絶対に行かない
-        if (mPlayer.getY() > mCamera.position.y) { // ←追加する
-            mCamera.position.y = mPlayer.getY(); // ←追加する
-        } // ←追加する
+        if (mPlayer.getY() > mCamera.position.y) {
+            mCamera.position.y = mPlayer.getY();
+        }
 
         // カメラの座標をアップデート（計算）し、スプライトの表示に反映させる
         mCamera.update();
@@ -157,12 +157,12 @@ public class GameScreen extends ScreenAdapter {
         mGame.batch.end();
 
         // スコア表示
-        mGuiCamera.update(); // ←追加する
-        mGame.batch.setProjectionMatrix(mGuiCamera.combined); // ←追加する
-        mGame.batch.begin(); // ←追加する
-        mFont.draw(mGame.batch, "HighScore: " + mHighScore, 16, GUI_HEIGHT - 15); // ←追加する
-        mFont.draw(mGame.batch, "Score: " + mScore, 16, GUI_HEIGHT - 35); // ←追加する
-        mGame.batch.end(); // ←追加する
+        mGuiCamera.update();
+        mGame.batch.setProjectionMatrix(mGuiCamera.combined);
+        mGame.batch.begin();
+        mFont.draw(mGame.batch, "HighScore: " + mHighScore, 16, GUI_HEIGHT - 15);
+        mFont.draw(mGame.batch, "Score: " + mScore, 16, GUI_HEIGHT - 35);
+        mGame.batch.end();
     }
 
     @Override
@@ -194,14 +194,14 @@ public class GameScreen extends ScreenAdapter {
             step.setPosition(x, y);
             mSteps.add(step);
 
-            if (mRandom.nextFloat() > 0.6f) {
+            if (mRandom.nextFloat() > 0.6f) {  // Starの出現確率
                 Star star = new Star(starTexture, 0, 0, 72, 72);
                 star.setPosition(step.getX() + mRandom.nextFloat(), step.getY() + Star.STAR_HEIGHT + mRandom.nextFloat() * 3);
                 mStars.add(star);
             }
 
             ///
-            if (mRandom.nextFloat() > 0.8f) {
+            if (mRandom.nextFloat() > 0.9f) {  // Enemyの出現確率
                 Enemy enemy = new Enemy(enemyTexture, 0, 0, 450, 450);
                 enemy.setPosition(step.getX() + mRandom.nextFloat(), step.getY() + Enemy.ENEMY_HEIGHT + mRandom.nextFloat() * 3);
                 mEnemys.add(enemy);
@@ -245,7 +245,7 @@ public class GameScreen extends ScreenAdapter {
     private void updatePlaying(float delta) {
         float accel = 0;
         if (Gdx.input.isTouched()) {
-            mGuiViewPort.unproject(mTouchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0)); // ←追加する
+            mGuiViewPort.unproject(mTouchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0));
             Rectangle left = new Rectangle(0, 0, GUI_WIDTH / 2, GUI_HEIGHT);
             Rectangle right = new Rectangle(GUI_WIDTH / 2, 0, GUI_WIDTH / 2, GUI_HEIGHT);
             if (left.contains(mTouchPoint.x, mTouchPoint.y)) {
@@ -254,6 +254,11 @@ public class GameScreen extends ScreenAdapter {
             if (right.contains(mTouchPoint.x, mTouchPoint.y)) {
                 accel = -5.0f;
             }
+        }
+
+        // Enemy
+        for (int i = 0; i < mEnemys.size(); i++) {
+            mEnemys.get(i).update(delta);
         }
 
         // Step
@@ -270,7 +275,7 @@ public class GameScreen extends ScreenAdapter {
 
 
         // 当たり判定を行う
-        checkCollision(); // ←追加する
+        checkCollision();
 
         // ゲームオーバーか判断する
         checkGameOver();
@@ -319,13 +324,13 @@ public class GameScreen extends ScreenAdapter {
 
             if (mPlayer.getBoundingRectangle().overlaps(star.getBoundingRectangle())) {
                 star.get();
-                mScore++; // ←追加する
-                if (mScore > mHighScore) { // ←追加する
-                    mHighScore = mScore; // ←追加する
+                mScore++;
+                if (mScore > mHighScore) {
+                    mHighScore = mScore;
                     //ハイスコアをPreferenceに保存する
-                    mPrefs.putInteger("HIGHSCORE", mHighScore); // ←追加する
-                    mPrefs.flush(); // ←追加する
-                } // ←追加する
+                    mPrefs.putInteger("HIGHSCORE", mHighScore);
+                    mPrefs.flush();
+                }
                 break;
             }
         }
@@ -346,7 +351,7 @@ public class GameScreen extends ScreenAdapter {
             if (mPlayer.getY() > step.getY()) {
                 if (mPlayer.getBoundingRectangle().overlaps(step.getBoundingRectangle())) {
                     mPlayer.hitStep();
-                    if (mRandom.nextFloat() > 0.5f) {
+                    if (mRandom.nextFloat() > 0.8f) { // Stepが消える確率
                         step.vanish();
                     }
                     break;
